@@ -1,0 +1,68 @@
+{
+  "menuItems": [
+    {
+      "id": "1",
+      "name": "Masala Dosa",
+      "price": 60,
+      "description": "Crispy dosa with spiced potato filling",
+      "image": "https://images.unsplash.com/photo-1668236543090-82eb5eace6d2?w=400",
+      "category": "South Indian"
+    },
+    {
+      "id": "2",
+      "name": "Veg Biryani",
+      "price": 120,
+      "description": "Aromatic rice with mixed vegetables",
+      "image": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=400",
+      "category": "Main Course"
+    },
+    {
+      "id": "3",
+      "name": "Paneer Tikka",
+      "price": 150,
+      "description": "Grilled cottage cheese with spices",
+      "image": "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=400",
+      "category": "Starters"
+    },
+    {
+      "id": "4",
+      "name": "Samosa (2 pcs)",
+      "price": 30,
+      "description": "Crispy pastry with spiced potato filling",
+      "image": "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400",
+      "category": "Snacks"
+    },
+    {
+      "id": "5",
+      "name": "Chole Bhature",
+      "price": 80,
+      "description": "Spiced chickpeas with fluffy fried bread",
+      "image": "https://images.unsplash.com/photo-1626132647523-66f5bf380027?w=400",
+      "category": "North Indian"
+    },
+    {
+      "id": "6",
+      "name": "Cold Coffee",
+      "price": 50,
+      "description": "Chilled coffee with ice cream",
+      "image": "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400",
+      "category": "Beverages"
+    },
+    {
+      "id": "7",
+      "name": "Veg Burger",
+      "price": 70,
+      "description": "Crispy patty with fresh veggies",
+      "image": "https://images.unsplash.com/photo-1550547660-d9450f859349?w=400",
+      "category": "Fast Food"
+    },
+    {
+      "id": "8",
+      "name": "Gulab Jamun (2 pcs)",
+      "price": 40,
+      "description": "Sweet milk dumplings in sugar syrup",
+      "image": "https://images.unsplash.com/photo-1666190066807-d3b3b7c8d773?w=400",
+      "category": "Desserts"
+    }
+  ]
+}
