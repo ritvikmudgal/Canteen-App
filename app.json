@@ -1,29 +1,13 @@
 {
   "expo": {
-    "name": "canteen-app",
-    "slug": "canteen-app",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "newArchEnabled": false,
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+    "extra": {
+      "eas": {
+        "projectId": "da69a792-4c9a-4c37-87a7-7d0ae9414641"
+      }
     },
-    "ios": {
-      "supportsTablet": true
-    },
+    "owner": "ritvikmudgal",
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "edgeToEdgeEnabled": true
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
+      "package": "com.ritvikmudgal.canteenapp"
     }
   }
 }

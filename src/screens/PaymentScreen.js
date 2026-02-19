@@ -1,40 +1,51 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ActivityIndicator,
+  ScrollView,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCart } from '../context/CartContext';
+
+const generateOrderId = () => {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let id = 'ORD-';
+  for (let i = 0; i < 8; i++) {
+    id += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return id;
+};
 
 const PaymentScreen = ({ navigation }) => {
   const { items, getCartTotal, clearCart } = useCart();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [selected, setSelected] = useState('counter');
   const total = getCartTotal();
 
-  const generateOrderId = () => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let orderId = 'ORD-';
-    for (let i = 0; i < 8; i++) {
-      orderId += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return orderId;
-  };
+  const methods = [
+    { id: 'counter', icon: '💵', name: 'Pay at Counter', desc: 'Cash or Card' },
+    { id: 'upi', icon: '📱', name: 'UPI (Mock)', desc: 'GPay / PhonePe' },
+    { id: 'card', icon: '💳', name: 'Card (Mock)', desc: 'Debit / Credit' },
+  ];
 
-  const handlePayment = () => {
+  const handlePay = () => {
     setIsProcessing(true);
-
-    // Simulate payment processing
     setTimeout(() => {
       const order = {
         orderId: generateOrderId(),
-        items: items.map(item => ({
-          id: item.id,
-          name: item.name,
-          price: item.price,
-          quantity: item.quantity,
+        items: items.map((i) => ({
+          id: i.id,
+          name: i.name,
+          price: i.price,
+          quantity: i.quantity,
         })),
         totalAmount: total,
         status: 'Placed',
         timestamp: new Date().toISOString(),
       };
-
       clearCart();
       setIsProcessing(false);
       navigation.replace('OrderConfirmation', { order });
@@ -43,73 +54,67 @@ const PaymentScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
-      <View style={styles.content}>
-        {/* Payment Card */}
+      <ScrollView
+        contentContainerStyle={styles.scroll}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Order Summary */}
         <View style={styles.card}>
-          <View style={styles.cardHeader}>
-            <Text style={styles.cardTitle}>Order Summary</Text>
-          </View>
-
-          <View style={styles.itemsList}>
-            {items.map((item) => (
-              <View key={item.id} style={styles.itemRow}>
-                <Text style={styles.itemName}>
-                  {item.name} x{item.quantity}
-                </Text>
-                <Text style={styles.itemPrice}>₹{item.price * item.quantity}</Text>
-              </View>
-            ))}
-          </View>
-
+          <Text style={styles.cardTitle}>Order Summary</Text>
+          {items.map((item) => (
+            <View key={item.id} style={styles.itemRow}>
+              <Text style={styles.itemName}>{item.name} x{item.quantity}</Text>
+              <Text style={styles.itemPrice}>₹{item.price * item.quantity}</Text>
+            </View>
+          ))}
           <View style={styles.divider} />
-
           <View style={styles.totalRow}>
-            <Text style={styles.totalLabel}>Total Amount</Text>
+            <Text style={styles.totalLabel}>Total</Text>
             <Text style={styles.totalValue}>₹{total}</Text>
           </View>
         </View>
 
-        {/* Payment Method */}
-        <View style={styles.paymentMethod}>
-          <Text style={styles.methodTitle}>Payment Method</Text>
-          <View style={styles.methodCard}>
-            <View style={styles.methodIcon}>
-              <Text style={styles.methodIconText}>💳</Text>
-            </View>
+        {/* Payment Methods */}
+        <Text style={styles.sectionTitle}>Payment Method</Text>
+        {methods.map((m) => (
+          <TouchableOpacity
+            key={m.id}
+            style={[styles.methodCard, selected === m.id && styles.methodSelected]}
+            onPress={() => setSelected(m.id)}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.methodIcon}>{m.icon}</Text>
             <View style={styles.methodInfo}>
-              <Text style={styles.methodName}>Pay at Counter</Text>
-              <Text style={styles.methodDesc}>Cash or Card accepted</Text>
+              <Text style={styles.methodName}>{m.name}</Text>
+              <Text style={styles.methodDesc}>{m.desc}</Text>
             </View>
-            <View style={styles.checkmark}>
-              <Text style={styles.checkmarkText}>✓</Text>
+            <View style={[styles.radio, selected === m.id && styles.radioSelected]}>
+              {selected === m.id && <View style={styles.radioDot} />}
             </View>
-          </View>
-        </View>
+          </TouchableOpacity>
+        ))}
 
-        {/* Info */}
         <View style={styles.infoBox}>
-          <Text style={styles.infoIcon}>ℹ️</Text>
           <Text style={styles.infoText}>
-            Your order will be prepared after payment confirmation at the counter.
+            ℹ️  Show your Order ID at the counter to collect your food.
           </Text>
         </View>
-      </View>
+      </ScrollView>
 
-      {/* Pay Button */}
-      <View style={styles.buttonContainer}>
+      <View style={styles.footer}>
         <TouchableOpacity
-          style={[styles.payButton, isProcessing && styles.payButtonDisabled]}
-          onPress={handlePayment}
+          style={[styles.payBtn, isProcessing && styles.payBtnDisabled]}
+          onPress={handlePay}
           disabled={isProcessing}
           activeOpacity={0.9}
         >
           {isProcessing ? (
-            <View style={styles.processingContainer}>
+            <View style={styles.processingRow}>
               <ActivityIndicator color="#FFFFFF" size="small" />
-              <Text style={styles.payButtonText}>  Processing...</Text>
+              <Text style={styles.payBtnText}>  Processing...</Text>
             </View>
           ) : (
-            <Text style={styles.payButtonText}>Pay Now • ₹{total}</Text>
+            <Text style={styles.payBtnText}>Pay Now  ₹{total}</Text>
           )}
         </TouchableOpacity>
       </View>
@@ -120,106 +125,101 @@ const PaymentScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FAFAFA',
+    backgroundColor: '#F5F5F5',
   },
-  content: {
-    flex: 1,
+  scroll: {
     padding: 16,
+    paddingBottom: 8,
   },
   card: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
+    borderRadius: 16,
+    padding: 18,
+    marginBottom: 20,
+    elevation: 3,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
-  },
-  cardHeader: {
-    marginBottom: 16,
+    shadowRadius: 6,
   },
   cardTitle: {
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: 16,
+    fontWeight: 'bold',
     color: '#1A1A2E',
-  },
-  itemsList: {
-    marginBottom: 16,
+    marginBottom: 14,
   },
   itemRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 8,
+    paddingVertical: 7,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F5F5F5',
   },
   itemName: {
     fontSize: 14,
-    color: '#666666',
+    color: '#555555',
     flex: 1,
   },
   itemPrice: {
     fontSize: 14,
     color: '#1A1A2E',
-    fontWeight: '600',
+    fontWeight: 'bold',
   },
   divider: {
     height: 1,
     backgroundColor: '#EEEEEE',
-    marginVertical: 8,
+    marginVertical: 12,
   },
   totalRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingTop: 8,
   },
   totalLabel: {
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: 16,
+    fontWeight: 'bold',
     color: '#1A1A2E',
   },
   totalValue: {
     fontSize: 24,
-    fontWeight: '800',
+    fontWeight: 'bold',
     color: '#FF6B35',
   },
-  paymentMethod: {
-    marginTop: 24,
-  },
-  methodTitle: {
-    fontSize: 16,
-    fontWeight: '700',
+  sectionTitle: {
+    fontSize: 15,
+    fontWeight: 'bold',
     color: '#1A1A2E',
-    marginBottom: 12,
+    marginBottom: 10,
   },
   methodCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: 14,
+    padding: 14,
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 10,
     borderWidth: 2,
+    borderColor: '#EEEEEE',
+    elevation: 1,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
+  },
+  methodSelected: {
     borderColor: '#FF6B35',
+    backgroundColor: '#FFF8F5',
   },
   methodIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#FFF3E0',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  methodIconText: {
     fontSize: 24,
+    marginRight: 12,
   },
   methodInfo: {
     flex: 1,
-    marginLeft: 12,
   },
   methodName: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 14,
+    fontWeight: 'bold',
     color: '#1A1A2E',
   },
   methodDesc: {
@@ -227,60 +227,63 @@ const styles = StyleSheet.create({
     color: '#888888',
     marginTop: 2,
   },
-  checkmark: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: '#FF6B35',
+  radio: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: '#CCCCCC',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  checkmarkText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '700',
+  radioSelected: {
+    borderColor: '#FF6B35',
+  },
+  radioDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#FF6B35',
   },
   infoBox: {
-    flexDirection: 'row',
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#E8F4FD',
     borderRadius: 12,
-    padding: 16,
-    marginTop: 24,
-    alignItems: 'flex-start',
-  },
-  infoIcon: {
-    fontSize: 16,
-    marginRight: 10,
+    padding: 14,
+    marginTop: 8,
   },
   infoText: {
     fontSize: 13,
     color: '#1565C0',
-    flex: 1,
     lineHeight: 18,
   },
-  buttonContainer: {
+  footer: {
     padding: 16,
     backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
     borderTopColor: '#EEEEEE',
   },
-  payButton: {
+  payBtn: {
     backgroundColor: '#2E7D32',
     borderRadius: 16,
-    paddingVertical: 18,
+    paddingVertical: 17,
     alignItems: 'center',
+    elevation: 4,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
   },
-  payButtonDisabled: {
-    backgroundColor: '#A5D6A7',
+  payBtnDisabled: {
+    backgroundColor: '#81C784',
   },
-  processingContainer: {
+  processingRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  payButtonText: {
+  payBtnText: {
     color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: 17,
+    fontWeight: 'bold',
   },
 });
 

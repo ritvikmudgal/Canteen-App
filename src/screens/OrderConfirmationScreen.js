@@ -1,5 +1,12 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Animated,
+  ScrollView,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const OrderConfirmationScreen = ({ navigation, route }) => {
@@ -11,8 +18,8 @@ const OrderConfirmationScreen = ({ navigation, route }) => {
     Animated.sequence([
       Animated.spring(scaleAnim, {
         toValue: 1,
-        tension: 50,
-        friction: 7,
+        tension: 60,
+        friction: 6,
         useNativeDriver: true,
       }),
       Animated.timing(fadeAnim, {
@@ -25,68 +32,73 @@ const OrderConfirmationScreen = ({ navigation, route }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        {/* Success Animation */}
+      <ScrollView
+        contentContainerStyle={styles.scroll}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Success Circle */}
         <Animated.View
-          style={[
-            styles.successCircle,
-            { transform: [{ scale: scaleAnim }] },
-          ]}
+          style={[styles.circle, { transform: [{ scale: scaleAnim }] }]}
         >
-          <Text style={styles.successEmoji}>✓</Text>
+          <Text style={styles.checkmark}>✓</Text>
         </Animated.View>
 
-        <Animated.View style={[styles.textContainer, { opacity: fadeAnim }]}>
-          <Text style={styles.title}>Order Placed!</Text>
-          <Text style={styles.subtitle}>
-            Your order has been placed successfully.
-          </Text>
+        <Animated.View style={{ opacity: fadeAnim, width: '100%' }}>
+          <Text style={styles.title}>Order Placed! 🎉</Text>
+          <Text style={styles.subtitle}>Your order has been placed successfully.</Text>
 
-          {/* Order Details Card */}
-          <View style={styles.orderCard}>
-            <View style={styles.orderRow}>
-              <Text style={styles.orderLabel}>Order ID</Text>
+          {/* Order Card */}
+          <View style={styles.card}>
+            <View style={styles.row}>
+              <Text style={styles.label}>Order ID</Text>
               <Text style={styles.orderId}>{order.orderId}</Text>
             </View>
-
             <View style={styles.divider} />
-
-            <View style={styles.orderRow}>
-              <Text style={styles.orderLabel}>Items</Text>
-              <Text style={styles.orderValue}>{order.items.length} items</Text>
+            <View style={styles.row}>
+              <Text style={styles.label}>Items</Text>
+              <Text style={styles.value}>{order.items.length} item(s)</Text>
             </View>
 
-            <View style={styles.orderRow}>
-              <Text style={styles.orderLabel}>Total Amount</Text>
+            {/* Items list */}
+            <View style={styles.itemsBox}>
+              {order.items.map((item) => (
+                <View key={item.id} style={styles.itemRow}>
+                  <Text style={styles.itemName}>{item.name} x{item.quantity}</Text>
+                  <Text style={styles.itemPrice}>₹{item.price * item.quantity}</Text>
+                </View>
+              ))}
+            </View>
+
+            <View style={styles.divider} />
+            <View style={styles.row}>
+              <Text style={styles.label}>Total Paid</Text>
               <Text style={styles.totalAmount}>₹{order.totalAmount}</Text>
             </View>
-
             <View style={styles.divider} />
-
-            <View style={styles.statusContainer}>
+            <View style={styles.statusRow}>
               <View style={styles.statusDot} />
               <Text style={styles.statusText}>Status: {order.status}</Text>
             </View>
           </View>
 
-          {/* Instructions */}
-          <View style={styles.instructionBox}>
-            <Text style={styles.instructionEmoji}>📍</Text>
-            <Text style={styles.instructionText}>
-              Please proceed to the counter and show your Order ID to collect your order.
+          {/* Instruction */}
+          <View style={styles.infoBox}>
+            <Text style={styles.infoText}>
+              📍 Show your Order ID{' '}
+              <Text style={styles.infoOrderId}>{order.orderId}</Text>
+              {' '}at the counter to collect your food.
             </Text>
           </View>
         </Animated.View>
-      </View>
+      </ScrollView>
 
-      {/* Back to Menu Button */}
-      <View style={styles.buttonContainer}>
+      <View style={styles.footer}>
         <TouchableOpacity
-          style={styles.menuButton}
+          style={styles.menuBtn}
           onPress={() => navigation.popToTop()}
           activeOpacity={0.9}
         >
-          <Text style={styles.menuButtonText}>Back to Menu</Text>
+          <Text style={styles.menuBtnText}>🏠  Back to Menu</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -96,91 +108,110 @@ const OrderConfirmationScreen = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FAFAFA',
+    backgroundColor: '#F5F5F5',
   },
-  content: {
-    flex: 1,
+  scroll: {
     alignItems: 'center',
-    paddingTop: 40,
-    paddingHorizontal: 24,
+    paddingTop: 36,
+    paddingHorizontal: 20,
+    paddingBottom: 16,
   },
-  successCircle: {
+  circle: {
     width: 100,
     height: 100,
     borderRadius: 50,
     backgroundColor: '#4CAF50',
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 20,
+    elevation: 6,
     shadowColor: '#4CAF50',
-    shadowOffset: { width: 0, height: 8 },
+    shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.4,
-    shadowRadius: 16,
-    elevation: 8,
+    shadowRadius: 10,
   },
-  successEmoji: {
+  checkmark: {
     fontSize: 48,
     color: '#FFFFFF',
-  },
-  textContainer: {
-    width: '100%',
-    alignItems: 'center',
+    fontWeight: 'bold',
   },
   title: {
     fontSize: 28,
-    fontWeight: '800',
+    fontWeight: 'bold',
     color: '#1A1A2E',
-    marginTop: 24,
+    textAlign: 'center',
+    marginBottom: 8,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 15,
     color: '#888888',
-    marginTop: 8,
     textAlign: 'center',
+    marginBottom: 24,
   },
-  orderCard: {
+  card: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    padding: 24,
+    borderRadius: 18,
+    padding: 20,
     width: '100%',
-    marginTop: 32,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
+    elevation: 3,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
+    shadowRadius: 6,
+    marginBottom: 14,
   },
-  orderRow: {
+  row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginVertical: 8,
+    marginVertical: 6,
   },
-  orderLabel: {
-    fontSize: 14,
+  label: {
+    fontSize: 13,
     color: '#888888',
   },
   orderId: {
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 15,
+    fontWeight: 'bold',
     color: '#FF6B35',
-    letterSpacing: 1,
   },
-  orderValue: {
+  value: {
     fontSize: 14,
     color: '#1A1A2E',
-    fontWeight: '600',
+    fontWeight: 'bold',
   },
-  totalAmount: {
-    fontSize: 20,
-    fontWeight: '800',
+  itemsBox: {
+    backgroundColor: '#F9F9F9',
+    borderRadius: 10,
+    padding: 10,
+    marginVertical: 8,
+  },
+  itemRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 4,
+  },
+  itemName: {
+    fontSize: 13,
+    color: '#666666',
+    flex: 1,
+  },
+  itemPrice: {
+    fontSize: 13,
     color: '#1A1A2E',
+    fontWeight: 'bold',
   },
   divider: {
     height: 1,
     backgroundColor: '#EEEEEE',
-    marginVertical: 12,
+    marginVertical: 8,
   },
-  statusContainer: {
+  totalAmount: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1A1A2E',
+  },
+  statusRow: {
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 4,
@@ -195,45 +226,44 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: 14,
     color: '#4CAF50',
-    fontWeight: '600',
+    fontWeight: 'bold',
   },
-  instructionBox: {
-    flexDirection: 'row',
+  infoBox: {
     backgroundColor: '#FFF8E1',
-    borderRadius: 16,
-    padding: 16,
-    marginTop: 24,
+    borderRadius: 14,
+    padding: 14,
     width: '100%',
-    alignItems: 'flex-start',
   },
-  instructionEmoji: {
-    fontSize: 20,
-    marginRight: 12,
-  },
-  instructionText: {
-    fontSize: 14,
-    color: '#F57C00',
-    flex: 1,
+  infoText: {
+    fontSize: 13,
+    color: '#795548',
     lineHeight: 20,
   },
-  buttonContainer: {
-    padding: 24,
+  infoOrderId: {
+    fontWeight: 'bold',
+    color: '#FF6B35',
   },
-  menuButton: {
+  footer: {
+    padding: 20,
+    backgroundColor: '#FFFFFF',
+    borderTopWidth: 1,
+    borderTopColor: '#EEEEEE',
+  },
+  menuBtn: {
     backgroundColor: '#FF6B35',
     borderRadius: 16,
-    paddingVertical: 18,
+    paddingVertical: 17,
     alignItems: 'center',
+    elevation: 4,
     shadowColor: '#FF6B35',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.4,
-    shadowRadius: 16,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
   },
-  menuButtonText: {
+  menuBtnText: {
     color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

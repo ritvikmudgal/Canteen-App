@@ -11,29 +11,22 @@ import OrderConfirmationScreen from './src/screens/OrderConfirmationScreen';
 
 const Stack = createNativeStackNavigator();
 
-const screenOptions = {
-  headerStyle: {
-    backgroundColor: '#FAFAFA',
-  },
-  headerTintColor: '#1A1A2E',
-  headerTitleStyle: {
-    fontWeight: '700',
-    fontSize: 18,
-  },
-  headerShadowVisible: {false},
-  headerBackTitleVisible: {false},
-};
-
 export default function App() {
   return (
     <SafeAreaProvider>
       <CartProvider>
         <NavigationContainer>
-          <Stack.Navigator screenOptions={screenOptions}>
+          <Stack.Navigator
+            screenOptions={{
+              headerStyle: { backgroundColor: '#FFFFFF' },
+              headerTintColor: '#1A1A2E',
+              headerTitleStyle: { fontWeight: 'bold', fontSize: 18 },
+            }}
+          >
             <Stack.Screen
               name="Home"
               component={HomeScreen}
-              options={{ headerShown: {false} }}
+              options={{ headerShown: false }}
             />
             <Stack.Screen
               name="Cart"
@@ -50,8 +43,8 @@ export default function App() {
               component={OrderConfirmationScreen}
               options={{
                 title: 'Order Confirmed',
-                headerShown: {false},
-                gestureEnabled: {false},
+                headerShown: false,
+                gestureEnabled: false,
               }}
             />
           </Stack.Navigator>

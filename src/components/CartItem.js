@@ -1,36 +1,49 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { useCart } from '../context/CartContext';
 
 const CartItem = ({ item }) => {
   const { increaseQuantity, decreaseQuantity, removeFromCart } = useCart();
+  const [imgError, setImgError] = useState(false);
 
   return (
     <View style={styles.container}>
-      <Image source={{ uri: item.image }} style={styles.image} />
+      {!imgError ? (
+        <Image
+          source={{ uri: item.image }}
+          style={styles.image}
+          onError={() => setImgError(true)}
+        />
+      ) : (
+        <View style={styles.imageFallback}>
+          <Text style={styles.fallbackEmoji}>{item.emoji || '🍽️'}</Text>
+        </View>
+      )}
+
       <View style={styles.details}>
-        <Text style={styles.name}>{item.name}</Text>
-        <Text style={styles.price}>₹{item.price} each</Text>
-        <View style={styles.quantityContainer}>
+        <Text style={styles.name} numberOfLines={1}>{item.name}</Text>
+        <Text style={styles.unitPrice}>₹{item.price} each</Text>
+        <View style={styles.qtyRow}>
           <TouchableOpacity
-            style={styles.quantityButton}
+            style={styles.qtyBtn}
             onPress={() => decreaseQuantity(item.id)}
           >
-            <Text style={styles.quantityButtonText}>−</Text>
+            <Text style={styles.qtyBtnText}>−</Text>
           </TouchableOpacity>
-          <Text style={styles.quantity}>{item.quantity}</Text>
+          <Text style={styles.qty}>{item.quantity}</Text>
           <TouchableOpacity
-            style={styles.quantityButton}
+            style={[styles.qtyBtn, styles.qtyBtnPlus]}
             onPress={() => increaseQuantity(item.id)}
           >
-            <Text style={styles.quantityButtonText}>+</Text>
+            <Text style={styles.qtyBtnPlusText}>+</Text>
           </TouchableOpacity>
         </View>
       </View>
-      <View style={styles.rightSection}>
-        <Text style={styles.totalPrice}>₹{item.price * item.quantity}</Text>
+
+      <View style={styles.right}>
+        <Text style={styles.total}>₹{item.price * item.quantity}</Text>
         <TouchableOpacity
-          style={styles.removeButton}
+          style={styles.removeBtn}
           onPress={() => removeFromCart(item.id)}
         >
           <Text style={styles.removeText}>Remove</Text>
@@ -44,79 +57,103 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     backgroundColor: '#FFFFFF',
-    borderRadius: 16,
+    borderRadius: 14,
     marginHorizontal: 16,
-    marginVertical: 8,
+    marginVertical: 6,
     padding: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
+    shadowRadius: 4,
+    alignItems: 'center',
   },
   image: {
-    width: 80,
-    height: 80,
-    borderRadius: 12,
+    width: 72,
+    height: 72,
+    borderRadius: 10,
     backgroundColor: '#F0F0F0',
+  },
+  imageFallback: {
+    width: 72,
+    height: 72,
+    borderRadius: 10,
+    backgroundColor: '#FFF3E0',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  fallbackEmoji: {
+    fontSize: 32,
   },
   details: {
     flex: 1,
     marginLeft: 12,
-    justifyContent: 'center',
   },
   name: {
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 15,
+    fontWeight: 'bold',
     color: '#1A1A2E',
-    marginBottom: 4,
+    marginBottom: 2,
   },
-  price: {
-    fontSize: 13,
-    color: '#888888',
+  unitPrice: {
+    fontSize: 12,
+    color: '#999999',
     marginBottom: 8,
   },
-  quantityContainer: {
+  qtyRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  quantityButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#F5F5F5',
+  qtyBtn: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#F0F0F0',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  quantityButtonText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#FF6B35',
+  qtyBtnPlus: {
+    backgroundColor: '#FF6B35',
   },
-  quantity: {
+  qtyBtnText: {
     fontSize: 16,
-    fontWeight: '700',
+    color: '#FF6B35',
+    fontWeight: 'bold',
+  },
+  qtyBtnPlusText: {
+    fontSize: 16,
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+  },
+  qty: {
+    fontSize: 15,
+    fontWeight: 'bold',
     color: '#1A1A2E',
-    marginHorizontal: 16,
+    marginHorizontal: 12,
+    minWidth: 18,
+    textAlign: 'center',
   },
-  rightSection: {
-    justifyContent: 'space-between',
+  right: {
     alignItems: 'flex-end',
-    paddingVertical: 4,
+    justifyContent: 'space-between',
+    alignSelf: 'stretch',
+    paddingLeft: 8,
   },
-  totalPrice: {
-    fontSize: 18,
-    fontWeight: '800',
+  total: {
+    fontSize: 17,
+    fontWeight: 'bold',
     color: '#FF6B35',
   },
-  removeButton: {
+  removeBtn: {
+    backgroundColor: '#FFF0F0',
     paddingVertical: 4,
     paddingHorizontal: 8,
+    borderRadius: 8,
   },
   removeText: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#E53935',
-    fontWeight: '600',
+    fontWeight: 'bold',
   },
 });
 
